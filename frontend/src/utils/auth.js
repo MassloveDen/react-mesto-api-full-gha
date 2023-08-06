@@ -1,4 +1,4 @@
-export const BASE_URL = /"https://api.project-mesto.nomoredomains.monster";
+export const BASE_URL = "https://masslove.back.nomoreparties.co";
 
 function checkResponse(response) {
   if (response.ok) {
