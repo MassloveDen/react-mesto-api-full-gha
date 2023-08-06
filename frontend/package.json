@@ -50,7 +50,7 @@
     "url": "git+ssh://git@github.com/MassloveDen/react-mesto-api-full-gha.git"
   },
   "bugs": {
- --   "url": "https://project-mesto.nomoredomains.monster/issues"
+   "url": "https://masslove.nomoreparties.co/issues"
   },
- -- "homepage": "https://project-mesto.nomoredomains.monster/"
+ "homepage": "https://masslove.nomoreparties.co/"
 }

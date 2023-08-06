@@ -1,5 +1,5 @@
 {
-  "name": "express-mesto-gha",
+  "name": "react-mesto-gha",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -27,12 +27,12 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:MassloveDen/express-mesto-gha.git"
+    "url": "git+ssh://git@github.com:MassloveDen/react-mesto-api-full-gha.git"
   },
   "bugs": {
-    "url": "https://github.com/MassloveDen/express-mesto-gha/issues"
+    "url": "https://github.com/MassloveDen/react-mesto-api-full-gha/issues"
   },
-  "homepage": "https://MassloveDen.github.io/express-mesto-gha",
+  "homepage": "https://MassloveDen.github.io/react-mesto-api-full-gha",
   "devDependencies": {
     "eslint": "^8.38.0",
     "eslint-config-airbnb-base": "^15.0.0",
