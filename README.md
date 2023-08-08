@@ -9,8 +9,8 @@
 
 ## Ссылки на проект
 
-Frontend masslove.nomoreparties.co
+IP 158.160.46.173 
 
-Backend masslove.back.nomoreparties.co
+Frontend https://masslove.nomoreparties.co
 
-IP-адрес 158.160.46.173
+Backend https://masslove.back.nomoreparties.co
