@@ -1,6 +1,6 @@
 const allowedCors = [
-  'https://masslove.back.nomoreparties.co',
-  'http://masslove.back.nomoreparties.co',
+  'https://masslove.nomoreparties.co',
+  'http://masslove.nomoreparties.co',
   'https://masslove.back.nomoreparties.co/users/me',
   'https://masslove.back.nomoreparties.co/cards',
   'https://masslove.back.nomoreparties.co/signup',

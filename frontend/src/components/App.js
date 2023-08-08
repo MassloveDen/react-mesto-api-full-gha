@@ -42,8 +42,8 @@ function App() {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
       try {
-        const user = await api.getInfo(jwt)
-        const cards = await api.getInitialCards(jwt)
+        const user = await api.getInfo(jwt);
+        const cards = await api.getInitialCards(jwt);
         if (!user) {
           throw new Error("Данные отсутствуют");
         }
@@ -61,6 +61,7 @@ function App() {
       setIsCardsLoading(false);
     }
   }, [navigate]);
+
   useEffect(() => {
     handleTokenCheck();
   }, []);
@@ -83,7 +84,7 @@ function App() {
   };
 
   const handleCardDelete = (card) => {
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem("jwt");
     api
       .deleteCard(card._id, jwt)
       .then(() => {
@@ -96,7 +97,7 @@ function App() {
 
   const handleUpdateUser = (data) => {
     setIsEditProfileChanging(true);
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem("jwt");
     api
       .addInfo(data, jwt)
       .then((newData) => {
@@ -115,7 +116,7 @@ function App() {
 
   const handleUpdateAvatar = (data) => {
     setIsEditAvatarChanging(true);
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem("jwt");
     api
       .addAvatar(data, jwt)
       .then((newData) => {
@@ -134,7 +135,7 @@ function App() {
 
   const handleAddPlaceSubmit = (data) => {
     setIsAddPlaceChanging(true);
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem("jwt");
     api
       .createCard(data, jwt)
       .then((newData) => {
@@ -153,12 +154,14 @@ function App() {
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    const jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem("jwt");
 
     api
       .changeLikeCardStatus(card._id, !isLiked, jwt)
       .then((newCard) => {
-        const newCards = cards.map(c => (c._id === card._id ? newCard.data : c));
+        const newCards = cards.map((c) =>
+          c._id === card._id ? newCard.data : c
+        );
         setCards(newCards);
       })
       .catch((error) => {
@@ -232,7 +235,7 @@ function App() {
     <div className="App">
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
-          <Header email={email} onExit={handleLogout} loggedIn={loggedIn}/>
+          <Header email={email} onExit={handleLogout} loggedIn={loggedIn} />
           <Routes>
             <Route
               path="/"
@@ -251,9 +254,17 @@ function App() {
                 />
               }
             />
-            <Route path="/sign-up" element={<Register handleRegister={handleRegistration} />}/>
+            <Route
+              path="/sign-up"
+              element={<Register handleRegister={handleRegistration} />}
+            />
             <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
-            <Route path="*" element={loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />}/>
+            <Route
+              path="*"
+              element={
+                loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />
+              }
+            />
           </Routes>
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
