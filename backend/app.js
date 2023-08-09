@@ -10,7 +10,6 @@ const errHandlers = require('./utils/handlers');
 const { PORT, MONGODB } = require('./config');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/rateLimit');
-
 const app = express();
 
 mongoose.connect(MONGODB, {
