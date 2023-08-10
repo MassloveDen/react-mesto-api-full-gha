@@ -8,7 +8,7 @@ function checkResponse(response) {
 }
 
 export function register({ email, password }) {
-  return fetch(`${BASE_URL}/sign-up`, {
+  return fetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -19,7 +19,7 @@ export function register({ email, password }) {
 }
 
 export function authorize({ email, password }) {
-  return fetch(`${BASE_URL}/sign-in`, {
+  return fetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: {
       Accept: "application/json",

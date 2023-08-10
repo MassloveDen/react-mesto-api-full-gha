@@ -255,14 +255,14 @@ function App() {
               }
             />
             <Route
-              path="/sign-up"
+              path="/signup"
               element={<Register handleRegister={handleRegistration} />}
             />
-            <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
+            <Route path="/signin" element={<Login onLogin={handleLogin} />} />
             <Route
               path="*"
               element={
-                loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />
+                loggedIn ? <Navigate to="/" /> : <Navigate to="/signin" />
               }
             />
           </Routes>
