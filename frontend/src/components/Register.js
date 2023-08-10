@@ -54,7 +54,7 @@ function Register({ handleRegister }) {
       <div className="auth__box">
         <p className="auth__box_title">
           Уже зарегистрированы?
-          <Link to="/sign-in" className="auth__box_link">
+          <Link to="/signin" className="auth__box_link">
             &nbsp;Войти
           </Link>
         </p>

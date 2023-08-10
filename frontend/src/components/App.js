@@ -210,7 +210,7 @@ function App() {
           setIsInfoTooltipOpen(true);
           setInfoTooltipStatus(true);
           setInfoText("Вы успешно зарегистрировались!");
-          navigate("/sign-in", { replace: true });
+          navigate("/signin", { replace: true });
         }
       } catch (e) {
         console.error(e);
@@ -228,7 +228,7 @@ function App() {
     setLoggedIn(false);
     setEmail("");
     localStorage.removeItem("jwt");
-    navigate("/sign-in", { replace: true });
+    navigate("/signin", { replace: true });
   }, [navigate]);
 
   return (
