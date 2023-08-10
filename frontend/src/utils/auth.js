@@ -1,4 +1,4 @@
-export const BASE_URL = "https://masslove.back.nomoreparties.co";
+export const BASE_URL = "https://api.mesto.masslove.nomoreparties.co";
 
 function checkResponse(response) {
   if (response.ok) {
@@ -8,7 +8,7 @@ function checkResponse(response) {
 }
 
 export function register({ email, password }) {
-  return fetch(`${BASE_URL}/signup`, {
+  return fetch(`${BASE_URL}/sign-up`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -19,7 +19,7 @@ export function register({ email, password }) {
 }
 
 export function authorize({ email, password }) {
-  return fetch(`${BASE_URL}/signin`, {
+  return fetch(`${BASE_URL}/sign-in`, {
     method: "POST",
     headers: {
       Accept: "application/json",

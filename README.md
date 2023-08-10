@@ -11,6 +11,6 @@
 
 IP 158.160.46.173 
 
-Frontend https://masslove.nomoreparties.co
+Frontend https://mesto.masslove.nomoreparties.co
 
-Backend https://masslove.back.nomoreparties.co
+Backend https://api.mesto.masslove.nomoreparties.co
