@@ -38,20 +38,35 @@ function App() {
   const [email, setEmail] = useState("");
   const [infoText, setInfoText] = useState("");
 
+  const handleTokenCheck = useCallback(async () => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      try {
+        const user = await api.getInfo(jwt)
+        const cards = await api.getInitialCards(jwt)
+
+        if (!user) {
+          throw new Error("Данные отсутствуют");
+        }
+        setCurrentUser(user);
+        setCards(cards.data);
+        setLoggedIn(true);
+        setEmail(user.email);
+        navigate("/");
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsCardsLoading(false);
+      }
+    } else {
+      setIsCardsLoading(false);
+    }
+  }, [navigate]);
+
+
   useEffect(() => {
-    loggedIn &&
-      Promise.all([api.getInfo(), api.getInitialCards()])
-        .then(([userData, cardsData]) => {
-          setCurrentUser(userData);
-          setCards(cardsData);
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          setIsCardsLoading(false);
-        });
-  }, [loggedIn]);
+    handleTokenCheck();
+  }, []);
 
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
@@ -71,8 +86,9 @@ function App() {
   };
 
   const handleCardDelete = (card) => {
+    const jwt = localStorage.getItem("jwt");
     api
-      .deleteCard(card._id)
+      .deleteCard(card._id, jwt)
       .then(() => {
         setCards((state) => state.filter((i) => i._id !== card._id));
       })
@@ -83,10 +99,11 @@ function App() {
 
   const handleUpdateUser = (data) => {
     setIsEditProfileChanging(true);
+    const jwt = localStorage.getItem('jwt');
     api
-      .addInfo(data)
+      .addInfo(data, jwt)
       .then((newData) => {
-        setCurrentUser(newData);
+        setCurrentUser(newData.data);
       })
       .then(() => {
         closeAllPopups();
@@ -101,10 +118,11 @@ function App() {
 
   const handleUpdateAvatar = (data) => {
     setIsEditAvatarChanging(true);
+    const jwt = localStorage.getItem('jwt');
     api
-      .addAvatar(data)
+      .addAvatar(data, jwt)
       .then((newData) => {
-        setCurrentUser(newData);
+        setCurrentUser(newData.data);
       })
       .then(() => {
         closeAllPopups();
@@ -119,10 +137,11 @@ function App() {
 
   const handleAddPlaceSubmit = (data) => {
     setIsAddPlaceChanging(true);
+    const jwt = localStorage.getItem('jwt');
     api
-      .createCard(data)
+      .createCard(data, jwt)
       .then((newData) => {
-        setCards([newData, ...cards]);
+        setCards([newData.data, ...cards]);
       })
       .then(() => {
         closeAllPopups();
@@ -138,12 +157,13 @@ function App() {
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
 
+    const jwt = localStorage.getItem('jwt');
     api
-      .changeLikeCardStatus(card._id, !isLiked)
+      .changeLikeCardStatus(card._id, !isLiked, jwt)
       .then((newCard) => {
-        setCards((state) =>
-          state.map((i) => (i._id === card._id ? newCard : i))
-        );
+        const newCards = cards.map(c => (c._id === card._id ? newCard.data : c));
+        setCards(newCards);
+
       })
       .catch((error) => {
         console.log(error);
@@ -155,7 +175,6 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsImagePopupOpen(false);
-    setSelectedCard(null);
     setIsInfoTooltipOpen(false);
   };
 
@@ -165,10 +184,11 @@ function App() {
       try {
         const data = await auth.authorize(info);
         if (data.token) {
-          localStorage.setItem("token", data.token);
+          localStorage.setItem("jwt", data.token);
           setLoggedIn(true);
           setEmail(info.email);
           navigate("/", { replace: true });
+          handleTokenCheck();
         }
       } catch (e) {
         console.error(e);
@@ -205,37 +225,12 @@ function App() {
     [navigate]
   );
 
-  const handleTokenCheck = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const user = await auth.checkToken(token);
-        if (!user) {
-          throw new Error("Данные отсутствуют");
-        }
-        setLoggedIn(true);
-        setEmail(user.data.email);
-        navigate("/");
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsCardsLoading(false);
-      }
-    } else {
-      setIsCardsLoading(false);
-    }
-  }, [navigate]);
-
   const handleLogout = useCallback(() => {
     setLoggedIn(false);
     setEmail("");
-    localStorage.removeItem("token");
+    localStorage.removeItem("jwt");
     navigate("/sign-in", { replace: true });
   }, [navigate]);
-
-  useEffect(() => {
-    handleTokenCheck();
-  }, [handleTokenCheck]);
 
   return (
     <div className="App">
