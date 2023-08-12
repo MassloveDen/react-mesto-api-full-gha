@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 
 function Header({ email, onExit, loggedIn }) {
   const location = useLocation();
-
+  
   return (
     <header className="header">
       <div className="header__container">
@@ -13,14 +13,14 @@ function Header({ email, onExit, loggedIn }) {
           className="header__logo"
           alt="Логотип Mesto Russia"
         />
-        {location.pathname === "/signin" && (
-          <Link className="header__link" to="/signup">
+        {location.pathname === "/sign-in" && (
+          <Link className="header__link" to="/sign-up">
             Регистрация
           </Link>
         )}
 
-        {location.pathname === "/signup" && (
-          <Link className="header__link" to="/signin">
+        {location.pathname === "/sign-up" && (
+          <Link className="header__link" to="/sign-in">
             Войти
           </Link>
         )}

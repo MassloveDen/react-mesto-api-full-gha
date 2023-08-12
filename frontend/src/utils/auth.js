@@ -1,39 +1,39 @@
-export const BASE_URL = "https://api.mesto.masslove.nomoreparties.co";
+const BASE_URL = "https://auth.nomoreparties.co";
 
-function checkResponse(response) {
-  if (response.ok) {
-    return response.json();
+function makeRequest(url, method, body, token) {
+  const headers = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+
+  if (token !== undefined) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
-  return Promise.reject(new Error(`Error: ${response.status}: ${response.statusText}`));
+
+  const config = {
+    method,
+    headers,
+  };
+
+  if (body !== undefined) {
+    config.body = JSON.stringify(body);
+  }
+
+  return fetch(`${BASE_URL}${url}`, config).then((response) => {
+    return response.ok
+      ? response.json()
+      : Promise.reject(`Error: ${response.status} ${response.statusText}`);
+  });
 }
 
 export function register({ email, password }) {
-  return fetch(`${BASE_URL}/signup`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password })
-  }).then((response) => checkResponse(response));
+  return makeRequest("/signup", "POST", { email, password });
 }
 
 export function authorize({ email, password }) {
-  return fetch(`${BASE_URL}/signin`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password })
-  }).then((response) => checkResponse(response));
+  return makeRequest("/signin", "POST", { email, password });
 }
 
-export const checkToken = (token) => {
-  return fetch(`${BASE_URL}/users/me`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  })
+export function checkToken(token) {
+  return makeRequest("/users/me", "GET", undefined, token);
 }

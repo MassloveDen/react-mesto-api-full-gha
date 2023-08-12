@@ -38,33 +38,20 @@ function App() {
   const [email, setEmail] = useState("");
   const [infoText, setInfoText] = useState("");
 
-  const handleTokenCheck = useCallback(async () => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      try {
-        const user = await api.getInfo(jwt);
-        const cards = await api.getInitialCards(jwt);
-        if (!user) {
-          throw new Error("Данные отсутствуют");
-        }
-        setCurrentUser(user);
-        setCards(cards.data);
-        setLoggedIn(true);
-        setEmail(user.email);
-        navigate("/");
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsCardsLoading(false);
-      }
-    } else {
-      setIsCardsLoading(false);
-    }
-  }, [navigate]);
-
   useEffect(() => {
-    handleTokenCheck();
-  }, []);
+    loggedIn &&
+      Promise.all([api.getInfo(), api.getInitialCards()])
+        .then(([userData, cardsData]) => {
+          setCurrentUser(userData);
+          setCards(cardsData);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          setIsCardsLoading(false);
+        });
+  }, [loggedIn]);
 
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
@@ -84,9 +71,8 @@ function App() {
   };
 
   const handleCardDelete = (card) => {
-    const jwt = localStorage.getItem("jwt");
     api
-      .deleteCard(card._id, jwt)
+      .deleteCard(card._id)
       .then(() => {
         setCards((state) => state.filter((i) => i._id !== card._id));
       })
@@ -97,11 +83,10 @@ function App() {
 
   const handleUpdateUser = (data) => {
     setIsEditProfileChanging(true);
-    const jwt = localStorage.getItem("jwt");
     api
-      .addInfo(data, jwt)
+      .addInfo(data)
       .then((newData) => {
-        setCurrentUser(newData.data);
+        setCurrentUser(newData);
       })
       .then(() => {
         closeAllPopups();
@@ -116,11 +101,10 @@ function App() {
 
   const handleUpdateAvatar = (data) => {
     setIsEditAvatarChanging(true);
-    const jwt = localStorage.getItem("jwt");
     api
-      .addAvatar(data, jwt)
+      .addAvatar(data)
       .then((newData) => {
-        setCurrentUser(newData.data);
+        setCurrentUser(newData);
       })
       .then(() => {
         closeAllPopups();
@@ -135,11 +119,10 @@ function App() {
 
   const handleAddPlaceSubmit = (data) => {
     setIsAddPlaceChanging(true);
-    const jwt = localStorage.getItem("jwt");
     api
-      .createCard(data, jwt)
+      .createCard(data)
       .then((newData) => {
-        setCards([newData.data, ...cards]);
+        setCards([newData, ...cards]);
       })
       .then(() => {
         closeAllPopups();
@@ -154,15 +137,13 @@ function App() {
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    const jwt = localStorage.getItem("jwt");
 
     api
-      .changeLikeCardStatus(card._id, !isLiked, jwt)
+      .changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
-        const newCards = cards.map((c) =>
-          c._id === card._id ? newCard.data : c
+        setCards((state) =>
+          state.map((i) => (i._id === card._id ? newCard : i))
         );
-        setCards(newCards);
       })
       .catch((error) => {
         console.log(error);
@@ -174,6 +155,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsImagePopupOpen(false);
+    setSelectedCard(null);
     setIsInfoTooltipOpen(false);
   };
 
@@ -183,11 +165,10 @@ function App() {
       try {
         const data = await auth.authorize(info);
         if (data.token) {
-          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("token", data.token);
           setLoggedIn(true);
           setEmail(info.email);
           navigate("/", { replace: true });
-          handleTokenCheck();
         }
       } catch (e) {
         console.error(e);
@@ -210,7 +191,7 @@ function App() {
           setIsInfoTooltipOpen(true);
           setInfoTooltipStatus(true);
           setInfoText("Вы успешно зарегистрировались!");
-          navigate("/signin", { replace: true });
+          navigate("/sign-in", { replace: true });
         }
       } catch (e) {
         console.error(e);
@@ -224,18 +205,43 @@ function App() {
     [navigate]
   );
 
+  const handleTokenCheck = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const user = await auth.checkToken(token);
+        if (!user) {
+          throw new Error("Данные отсутствуют");
+        }
+        setLoggedIn(true);
+        setEmail(user.data.email);
+        navigate("/");
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsCardsLoading(false);
+      }
+    } else {
+      setIsCardsLoading(false);
+    }
+  }, [navigate]);
+
   const handleLogout = useCallback(() => {
     setLoggedIn(false);
     setEmail("");
-    localStorage.removeItem("jwt");
-    navigate("/signin", { replace: true });
+    localStorage.removeItem("token");
+    navigate("/sign-in", { replace: true });
   }, [navigate]);
+
+  useEffect(() => {
+    handleTokenCheck();
+  }, [handleTokenCheck]);
 
   return (
     <div className="App">
       <div className="page">
         <CurrentUserContext.Provider value={currentUser}>
-          <Header email={email} onExit={handleLogout} loggedIn={loggedIn} />
+          <Header email={email} onExit={handleLogout} loggedIn={loggedIn}/>
           <Routes>
             <Route
               path="/"
@@ -254,17 +260,9 @@ function App() {
                 />
               }
             />
-            <Route
-              path="/signup"
-              element={<Register handleRegister={handleRegistration} />}
-            />
-            <Route path="/signin" element={<Login onLogin={handleLogin} />} />
-            <Route
-              path="*"
-              element={
-                loggedIn ? <Navigate to="/" /> : <Navigate to="/signin" />
-              }
-            />
+            <Route path="/sign-up" element={<Register handleRegister={handleRegistration} />}/>
+            <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
+            <Route path="*" element={loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />}/>
           </Routes>
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
