@@ -9,7 +9,7 @@
 
 ## Ссылки на проект
 
-IP 158.160.46.173 
+IP 158.160.46.173  
 
 Frontend https://mesto.masslove.nomoreparties.co
 
